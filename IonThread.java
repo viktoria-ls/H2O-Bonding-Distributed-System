@@ -40,7 +40,6 @@ public class IonThread extends Thread {
 
                 for(int i = 0; i < amount; i++) {
                     requestedCount++;
-                    typeSemaphore.release(1);
 
                     LocalDateTime currTime = LocalDateTime.now();
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -49,6 +48,8 @@ public class IonThread extends Thread {
                     String requestLog = type.charAt(0) + requestedCount.toString() + ", request, " + currTimeStr;
 
                     System.out.println(requestLog);
+
+                    typeSemaphore.release(1);
                 }
             }
         } catch (IOException e) {

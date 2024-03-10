@@ -30,7 +30,7 @@ class HydrogenClient {
 
             System.out.println("[HYDROGEN CLIENT] Enter N:");
 
-            int currStart = 0;
+            int currStart = 1;
 
             while (true) {
                 N = sc.nextInt();

@@ -115,7 +115,7 @@ class ClientAcceptThread extends Thread {
                         System.out.println("Accepted Oxygen Client.");
                         break;
                     default:
-                        System.out.print("Unidentified Socket Rejected.");
+                        System.out.print("Unidentified Socket rejected.");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
