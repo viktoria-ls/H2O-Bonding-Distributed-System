@@ -1,6 +1,7 @@
 import java.util.Scanner;
-import java.io.IOException;
 import java.net.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.io.*;
 
 class HydrogenClient {
@@ -13,6 +14,8 @@ class HydrogenClient {
 
     static DataOutputStream out;
     static DataInputStream input;
+
+    static Scanner sc = new Scanner(System.in);
     
     public static void main(String[] args) {
         try {
@@ -21,25 +24,35 @@ class HydrogenClient {
             input = new DataInputStream(mainServer.getInputStream());
 
             out.writeUTF("Hydrogen");
-            Scanner sc = new Scanner(System.in);
-            HydrogenListenerThread listener = new HydrogenListenerThread();
 
+            HydrogenListenerThread listener = new HydrogenListenerThread();
             listener.start();
-            System.out.println("HYDROGEN CLIENT");
-            System.out.print("Enter N: ");
+
+            System.out.println("[HYDROGEN CLIENT] Enter N:");
+
+            int currStart = 0;
+
             while (true) {
-                
                 N = sc.nextInt();
 
+                for (int i = currStart; i < currStart + N; i++) {
+                    LocalDateTime currTime = LocalDateTime.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    String currTimeStr = currTime.format(formatter);
+                    System.out.println("H" + i + ", request, " + currTimeStr);
+                }
+
                 out.writeInt(N);
+
+                currStart += N;
             }
             
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+        } finally {
+            sc.close();
         }
         
     }
@@ -51,7 +64,6 @@ class HydrogenListenerThread extends Thread {
             try {
                 System.out.println(HydrogenClient.input.readUTF());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

@@ -1,7 +1,7 @@
 import java.util.concurrent.Semaphore;
-import java.util.*;
-import java.io.IOException;
 import java.net.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.io.*;
 
 class Server {
@@ -34,54 +34,61 @@ class Server {
             serverSocket = new ServerSocket(PORT);
             ClientAcceptThread accept = new ClientAcceptThread();
             
+            // Ensures that both clients have connected
             accept.start();
             try {
                 accept.join();
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             
             oxygenThread.start();
             hydrogenThread.start();
 
+            // Bonding
             while (true) {
                 try {
                     hydrogenSemaphore.acquire(2);
                     oxygenSemaphore.acquire(1);
 
-                    for(int i = 0;i < 2;i++) {
+                    for(int i = 0; i < 2; i++) {
                         bondedHydrogenCount++;
 
-                        String temp = "H" + bondedHydrogenCount.toString() + ", bonded, time";
-
-                        System.out.println(temp);
-                        hydrogenOutputStream.writeUTF(temp);
+                        String hBondLog = "H" + bondedHydrogenCount.toString() + ", bonded, " + getTimestamp();
+                        System.out.println(hBondLog);
+                        hydrogenOutputStream.writeUTF(hBondLog);
                     }
 
                     bondedOxygenCount++;
-                    String temp = "O" + bondedOxygenCount.toString() + ", bonded, time";
-                    System.out.println(temp);
-                    oxygenOutputStream.writeUTF(temp);
+
+                    String oBondLog = "O" + bondedOxygenCount.toString() + ", bonded, " + getTimestamp();
+                    System.out.println(oBondLog);
+                    oxygenOutputStream.writeUTF(oBondLog);
                     
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
 
-        
+    public static String getTimestamp() {
+        LocalDateTime currTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String currTimeStr = currTime.format(formatter);
+
+        return currTimeStr;
     }
 }
 
 class ClientAcceptThread extends Thread {
     public void run() {
         System.out.println("Started accepting Sockets.");
+
+        // While hydrogen socket and oxygen socket haven't connected yet
         while(Server.hydrogenSocket == null || Server.oxygenSocket == null) {
             try {
                 Socket temp = Server.serverSocket.accept();
@@ -111,16 +118,9 @@ class ClientAcceptThread extends Thread {
                         System.out.print("Unidentified Socket Rejected.");
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
         }
-    }
-}
-
-class BondThread extends Thread {
-    public void run() {
-
     }
 }

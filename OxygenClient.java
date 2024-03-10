@@ -1,5 +1,7 @@
 import java.util.Scanner;
 import java.net.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.io.*;
 
 class OxygenClient {
@@ -12,6 +14,9 @@ class OxygenClient {
     
     static DataOutputStream out;
     static DataInputStream input;
+
+    static Scanner sc = new Scanner(System.in);
+
     public static void main(String[] args) {
         try {
             mainServer = new Socket(address, port);
@@ -19,27 +24,35 @@ class OxygenClient {
             input = new DataInputStream(mainServer.getInputStream());
 
             out.writeUTF("Oxygen");
-            Scanner sc = new Scanner(System.in);
+
             OxygenListenerThread listener = new OxygenListenerThread();
             listener.start();
 
-            System.out.println("Oxygen CLIENT");
-            System.out.print("Enter N:  ");
+            System.out.println("[OXYGEN CLIENT] Enter N:");
+
+            int currStart = 0;
             
             while (true) {
-                
                 N = sc.nextInt();
+
+                for (int i = currStart; i < currStart + N; i++) {
+                    LocalDateTime currTime = LocalDateTime.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    String currTimeStr = currTime.format(formatter);
+                    System.out.println("O" + i + ", request, " + currTimeStr);
+                }
 
                 out.writeInt(N);
 
+                currStart += N;
             }
             
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+        } finally {
+            sc.close();
         }
         
     }
@@ -51,7 +64,6 @@ class OxygenListenerThread extends Thread {
             try {
                 System.out.println(OxygenClient.input.readUTF());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

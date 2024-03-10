@@ -1,8 +1,7 @@
 import java.util.concurrent.Semaphore;
-import java.util.*;
-import java.io.IOException;
-import java.net.*;
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class IonThread extends Thread {
     String type;
@@ -39,19 +38,20 @@ public class IonThread extends Thread {
             while (true) {
                 int amount = i.readInt();
 
-                for(int i = 0;i < amount;i++) {
+                for(int i = 0; i < amount; i++) {
                     requestedCount++;
                     typeSemaphore.release(1);
-                    String temp = type.charAt(0) + requestedCount.toString() + ", request, time";
 
-                    System.out.println(temp);
-                    o.writeUTF(temp);
+                    LocalDateTime currTime = LocalDateTime.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    String currTimeStr = currTime.format(formatter);
+
+                    String requestLog = type.charAt(0) + requestedCount.toString() + ", request, " + currTimeStr;
+
+                    System.out.println(requestLog);
                 }
-
-                o.writeUTF("Enter N: ");
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         
