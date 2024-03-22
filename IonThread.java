@@ -47,6 +47,8 @@ public class IonThread extends Thread {
 
                     String requestLog = type.charAt(0) + requestedCount.toString() + ", request, " + currTimeStr;
 
+                    Server.requests.put(requestLog.substring(0, 2), "requested");
+
                     System.out.println(requestLog);
 
                     typeSemaphore.release(1);

@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 import java.net.*;
 import java.time.LocalDateTime;
@@ -29,6 +30,9 @@ class Server {
     static Integer bondedOxygenCount = 0;
     static Integer bondedHydrogenCount = 0;
 
+    static HashMap<String, String> requests = new HashMap<String, String>();
+    static int errors = 0;
+
     public static void main(String[] args) {
         try {
             serverSocket = new ServerSocket(PORT);
@@ -55,6 +59,7 @@ class Server {
                         bondedHydrogenCount++;
 
                         String hBondLog = "H" + bondedHydrogenCount.toString() + ", bonded, " + getTimestamp();
+                        sanityCheck(hBondLog.substring(0, 2));
                         System.out.println(hBondLog);
                         hydrogenOutputStream.writeUTF(hBondLog);
                     }
@@ -62,6 +67,7 @@ class Server {
                     bondedOxygenCount++;
 
                     String oBondLog = "O" + bondedOxygenCount.toString() + ", bonded, " + getTimestamp();
+                    sanityCheck(oBondLog.substring(0, 2));
                     System.out.println(oBondLog);
                     oxygenOutputStream.writeUTF(oBondLog);
                     
@@ -81,6 +87,15 @@ class Server {
         String currTimeStr = currTime.format(formatter);
 
         return currTimeStr;
+    }
+
+    public static void sanityCheck(String key) {
+        System.out.println(key);
+        if(Server.requests.get(key) == null) {
+            Server.errors++;
+        }
+        
+        System.out.println("[Sanity Check] Errors found: " + errors);
     }
 }
 

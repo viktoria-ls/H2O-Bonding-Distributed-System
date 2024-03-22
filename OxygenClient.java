@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Scanner;
 import java.net.*;
 import java.time.LocalDateTime;
@@ -9,11 +10,13 @@ class OxygenClient {
 
     //Server
     private static int port = 1337;
-    private static String address = "127.0.0.1";
+    private static String address = "10.50.190.117";
     private static Socket mainServer = null;
     
     static DataOutputStream out;
     static DataInputStream input;
+
+    static HashMap<String, String> requests = new HashMap<String, String>();
 
     static Scanner sc = new Scanner(System.in);
 
@@ -40,6 +43,8 @@ class OxygenClient {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                     String currTimeStr = currTime.format(formatter);
                     System.out.println("O" + i + ", request, " + currTimeStr);
+
+                    requests.put("O" + i, "requested");
                 }
 
                 out.writeInt(N);
@@ -59,13 +64,25 @@ class OxygenClient {
 }
 
 class OxygenListenerThread extends Thread {
+    int errors = 0;
+
     public void run() {
         while(true) {
             try {
-                System.out.println(OxygenClient.input.readUTF());
+                String read = OxygenClient.input.readUTF();
+                String requestKey = read.substring(0, 2);
+                sanityCheck(requestKey);
+                System.out.println(read);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void sanityCheck(String key) {
+        if(OxygenClient.requests.get(key) == null)
+            errors++;
+        
+        System.out.println("[Sanity Check] Errors Found: " + errors);
     }
 }

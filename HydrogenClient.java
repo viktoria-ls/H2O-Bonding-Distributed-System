@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Scanner;
 import java.net.*;
 import java.time.LocalDateTime;
@@ -11,6 +12,8 @@ class HydrogenClient {
     private static int port = 1337;
     private static String address = "127.0.0.1";
     private static Socket mainServer = null;
+
+    static HashMap<String, String> requests = new HashMap<String, String>();
 
     static DataOutputStream out;
     static DataInputStream input;
@@ -40,6 +43,9 @@ class HydrogenClient {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                     String currTimeStr = currTime.format(formatter);
                     System.out.println("H" + i + ", request, " + currTimeStr);
+
+                    requests.put("H" + i, "requested");
+                    System.out.println(requests.keySet());
                 }
 
                 out.writeInt(N);
@@ -59,13 +65,27 @@ class HydrogenClient {
 }
 
 class HydrogenListenerThread extends Thread {
+    int errors = 0;
+
     public void run() {
         while(true) {
             try {
-                System.out.println(HydrogenClient.input.readUTF());
+                String read = HydrogenClient.input.readUTF();
+                String requestKey = read.substring(0, 2);
+                sanityCheck(requestKey);
+                System.out.println(read);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void sanityCheck(String key) {
+        System.out.println(key);
+        if(HydrogenClient.requests.get(key) == null) {
+            errors++;
+        }
+        
+        System.out.println("[Sanity Check] Errors found: " + errors);
     }
 }
