@@ -42,7 +42,7 @@ public class IonThread extends Thread {
                     requestedCount++;
 
                     LocalDateTime currTime = LocalDateTime.now();
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSS");
                     String currTimeStr = currTime.format(formatter);
 
                     String requestLog = type.charAt(0) + requestedCount.toString() + ", request, " + currTimeStr;

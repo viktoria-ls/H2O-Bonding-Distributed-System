@@ -7,12 +7,14 @@ import java.io.*;
 
 class HydrogenClient {
     static int N = 0;
+    static long startTime;
 
     //Server
     private static int port = 1337;
     private static String address = "127.0.0.1";
     private static Socket mainServer = null;
 
+    // Stores request ID and request Timestamp
     static HashMap<String, String> requests = new HashMap<String, String>();
 
     static DataOutputStream out;
@@ -40,15 +42,15 @@ class HydrogenClient {
 
                 for (int i = currStart; i < currStart + N; i++) {
                     LocalDateTime currTime = LocalDateTime.now();
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSS");
                     String currTimeStr = currTime.format(formatter);
                     System.out.println("H" + i + ", request, " + currTimeStr);
 
                     requests.put("H" + i, "requested");
-                    System.out.println(requests.keySet());
                 }
 
                 out.writeInt(N);
+                startTime = System.currentTimeMillis();
 
                 currStart += N;
             }
@@ -71,19 +73,27 @@ class HydrogenListenerThread extends Thread {
         while(true) {
             try {
                 String read = HydrogenClient.input.readUTF();
-                String requestKey = read.substring(0, 2);
+                String requestKey = read.substring(0, read.indexOf(","));
                 sanityCheck(requestKey);
                 System.out.println(read);
+
+                if(Integer.parseInt(requestKey.substring(1)) == HydrogenClient.N) {
+                    long endTime = System.currentTimeMillis();
+                    System.out.println("TOTAL TIME FOR HYDROGEN (milliseconds): " + (endTime - HydrogenClient.startTime));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    // Checks if bonded Hydrogen was even requested
     public void sanityCheck(String key) {
-        System.out.println(key);
         if(HydrogenClient.requests.get(key) == null) {
             errors++;
+        } else {
+            HydrogenClient.requests.remove(key);
+            
         }
         
         System.out.println("[Sanity Check] Errors found: " + errors);

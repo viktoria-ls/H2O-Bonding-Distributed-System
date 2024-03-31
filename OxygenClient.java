@@ -7,10 +7,11 @@ import java.io.*;
 
 class OxygenClient {
     static int N = 0;
+    static long startTime;
 
     //Server
     private static int port = 1337;
-    private static String address = "10.50.190.117";
+    private static String address = "127.0.0.1";
     private static Socket mainServer = null;
     
     static DataOutputStream out;
@@ -31,7 +32,7 @@ class OxygenClient {
             OxygenListenerThread listener = new OxygenListenerThread();
             listener.start();
 
-            System.out.println("[OXYGEN CLIENT] Enter N:");
+            System.out.println("[OXYGEN CLIENT] Enter M:");
 
             int currStart = 1;
             
@@ -40,7 +41,7 @@ class OxygenClient {
 
                 for (int i = currStart; i < currStart + N; i++) {
                     LocalDateTime currTime = LocalDateTime.now();
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSS");
                     String currTimeStr = currTime.format(formatter);
                     System.out.println("O" + i + ", request, " + currTimeStr);
 
@@ -48,6 +49,7 @@ class OxygenClient {
                 }
 
                 out.writeInt(N);
+                startTime = System.currentTimeMillis();
 
                 currStart += N;
             }
@@ -70,9 +72,14 @@ class OxygenListenerThread extends Thread {
         while(true) {
             try {
                 String read = OxygenClient.input.readUTF();
-                String requestKey = read.substring(0, 2);
+                String requestKey = read.substring(0, read.indexOf(","));
                 sanityCheck(requestKey);
                 System.out.println(read);
+
+                if(Integer.parseInt(requestKey.substring(1)) == OxygenClient.N) {
+                    long endTime = System.currentTimeMillis();
+                    System.out.println("TOTAL TIME FOR OXYGEN (milliseconds): " + (endTime - OxygenClient.startTime));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -80,8 +87,11 @@ class OxygenListenerThread extends Thread {
     }
 
     public void sanityCheck(String key) {
-        if(OxygenClient.requests.get(key) == null)
+        if(OxygenClient.requests.get(key) == null) {
             errors++;
+        } else {
+            OxygenClient.requests.remove(key);
+        }
         
         System.out.println("[Sanity Check] Errors Found: " + errors);
     }

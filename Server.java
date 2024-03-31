@@ -83,7 +83,7 @@ class Server {
 
     public static String getTimestamp() {
         LocalDateTime currTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSS");
         String currTimeStr = currTime.format(formatter);
 
         return currTimeStr;
