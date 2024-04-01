@@ -59,7 +59,7 @@ class Server {
                         bondedHydrogenCount++;
 
                         String hBondLog = "H" + bondedHydrogenCount.toString() + ", bonded, " + getTimestamp();
-                        sanityCheck(hBondLog.substring(0, 2));
+                        sanityCheck(hBondLog.substring(0, hBondLog.indexOf(",")));
                         System.out.println(hBondLog);
                         hydrogenOutputStream.writeUTF(hBondLog);
                     }
@@ -67,7 +67,7 @@ class Server {
                     bondedOxygenCount++;
 
                     String oBondLog = "O" + bondedOxygenCount.toString() + ", bonded, " + getTimestamp();
-                    sanityCheck(oBondLog.substring(0, 2));
+                    sanityCheck(oBondLog.substring(0, oBondLog.indexOf(",")));
                     System.out.println(oBondLog);
                     oxygenOutputStream.writeUTF(oBondLog);
                     
