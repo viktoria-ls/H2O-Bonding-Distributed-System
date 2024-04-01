@@ -90,10 +90,10 @@ class Server {
 
     public static void sanityCheck(String key) {
         System.out.println(key);
-        if(Server.requests.get(key) == null) {
+        if(Server.requests.get(key) == null || Server.requests.get(key).equals("completed")) {
             Server.errors++;
         } else {
-
+            Server.requests.put(key, "completed");
         }
         
         System.out.println("[Sanity Check] Errors found: " + errors);

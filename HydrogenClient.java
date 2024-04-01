@@ -89,11 +89,10 @@ class HydrogenListenerThread extends Thread {
 
     // Checks if bonded Hydrogen was even requested
     public void sanityCheck(String key) {
-        if(HydrogenClient.requests.get(key) == null) {
+        if(HydrogenClient.requests.get(key) == null || HydrogenClient.requests.get(key).equals("completed")) {
             errors++;
         } else {
-            HydrogenClient.requests.remove(key);
-            
+            HydrogenClient.requests.put(key, "completed");
         }
         
         System.out.println("[Sanity Check] Errors found: " + errors);

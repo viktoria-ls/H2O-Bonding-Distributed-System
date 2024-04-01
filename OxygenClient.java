@@ -88,10 +88,10 @@ class OxygenListenerThread extends Thread {
     }
 
     public void sanityCheck(String key) {
-        if(OxygenClient.requests.get(key) == null) {
+        if(OxygenClient.requests.get(key) == null || OxygenClient.requests.get(key).equals("completed")) {
             errors++;
         } else {
-            OxygenClient.requests.remove(key);
+            OxygenClient.requests.put(key, "completed");
         }
         
         System.out.println("[Sanity Check] Errors Found: " + errors);
