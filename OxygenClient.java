@@ -12,6 +12,7 @@ class OxygenClient {
     //Server
     private static int port = 1337;
     private static String address = "127.0.0.1";
+    //   10.50.190.111
     private static Socket mainServer = null;
     
     static DataOutputStream out;

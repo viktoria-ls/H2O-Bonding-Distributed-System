@@ -1,5 +1,4 @@
-import java.util.HashMap;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.*;
 import java.net.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +29,7 @@ class Server {
     static Integer bondedOxygenCount = 0;
     static Integer bondedHydrogenCount = 0;
 
-    static HashMap<String, String> requests = new HashMap<String, String>();
+    static ConcurrentMap<String, String> requests = new ConcurrentHashMap<String, String>();
     static int errors = 0;
 
     public static void main(String[] args) {
@@ -93,6 +92,8 @@ class Server {
         System.out.println(key);
         if(Server.requests.get(key) == null) {
             Server.errors++;
+        } else {
+
         }
         
         System.out.println("[Sanity Check] Errors found: " + errors);
